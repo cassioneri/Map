@@ -11,7 +11,7 @@ The one implemented here uses a much simpler data structure, namely, a binary
 search tree which has logarithmic complexity <b>on average</b> for insertion and
 searching but in the worst case the complexity is linear.
 
-In addition, this implementation uses operators <tt>&lt;</tt> and </tt>==</tt>
+In addition, this implementation uses operators <tt>&lt;</tt> and <tt>==</tt>
 to compare keys. In contrast, <tt>std::map</tt> allows the usage of other
 function objects (the default is <tt>std::less</tt>) for comparisons and it
 does not use <tt>==</tt>. Indeed, for <tt>std::map</tt> equality (or more
@@ -19,16 +19,17 @@ correctly, equivalence) of <tt>x</tt> and <tt>y</tt> is expressed by
 
 <pre>!comp(x, y) && !comp(y, x)</pre>
 
-where <tt>comp<tt> is the comparison object. Notice that this implies two
+where <tt>comp</tt> is the comparison object. Notice that this implies two
 calls to <tt>comp::operator()</tt> and this can be wasteful.
 
 The implementation is <b>incomplete</b> and is not meant for production code. This is
 a simple exercise that I assigned to myself.
 
 The file <tt>map.h</tt> is the implementation.
-The file <tt>test.cpp</tt> is the unit test (based on the "assert" macro, sorry!).
+The file <tt>test.cpp</tt> is the unit test (based on the <tt>assert</tt> macro,
+sorry!).
 
-Compile it with
+Compile the test with
 
 <pre>g++ --std=c++11 test.cpp -o test -Wall -Wextra -pedantic</pre>
 
