@@ -38,7 +38,7 @@ Todo
 
 <ul>
 <li>
-Implement missing methods. The idea is providing almost the complete same interface
+Implement missing methods. The idea is providing almost the interface
 of  <tt>std::map</tt>.
 </li>
 <li>
