@@ -1,7 +1,7 @@
 Map
 ===
 
-The file <tt>map.h<tt> implements a container similar to std::map.
+The file <tt>map.h</tt> implements a container similar to std::map.
 
 The main difference is that <tt>std::map</tt> uses (very likely) a complex data
 structure called red-black tree which guarantees logarithmic complexity for
