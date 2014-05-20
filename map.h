@@ -572,6 +572,6 @@ private:
   lnode_ptr_    first_ = nullptr;
   size_type     size_  = 0;
 
-}; // class btree
+}; // class map
 
 #endif // MAP_H_

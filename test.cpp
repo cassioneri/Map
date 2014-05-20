@@ -6,6 +6,9 @@
  International License. See
  http://creativecommons.org/licenses/by-sa/4.0/
 
+ Compile it with
+ g++ --std=c++11 test.cpp -o test -Wall -Wextra -pedantic
+
 *******************************************************************************/
 
 #include <algorithm>
