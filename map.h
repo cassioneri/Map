@@ -1,3 +1,13 @@
+/*******************************************************************************
+
+ Copyright (C) 2014 Cassio Neri.
+
+ This work is licensed under a Creative Commons Attribution-ShareAlike 4.0
+ International License. See
+ http://creativecommons.org/licenses/by-sa/4.0/
+
+*******************************************************************************/
+
 #ifndef MAP_H_
 #define MAP_H_
 
