@@ -22,8 +22,8 @@ correctly, equivalence) of <tt>x</tt> and <tt>y</tt> is expressed by
 where <tt>comp</tt> is the comparison object. Notice that this implies two
 calls to <tt>comp::operator()</tt> and this can be wasteful.
 
-The implementation is <b>incomplete</b> and is not meant for production code. This is
-a simple exercise that I assigned to myself.
+The implementation is <b>incomplete</b> (I spent just one day on it) and is not
+meant for production code. This is a simple exercise that I assigned to myself.
 
 The file <tt>map.h</tt> is the implementation.
 The file <tt>test.cpp</tt> is the unit test (based on the <tt>assert</tt> macro,
