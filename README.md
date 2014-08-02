@@ -3,9 +3,9 @@ Map
 
 The file <tt>map.h</tt> implements a container similar to <tt>std::map</tt>.
 
-The main difference is that <tt>std::map</tt> uses (very likely) called
-red-black tree which guarantees logarithmic complexity for search, insertion and
-deletion.
+The main difference is that <tt>std::map</tt> (very likely) implements a
+red-black trees which guarantees logarithmic complexity for search, insertion
+and deletion.
 
 The one implemented here uses a much simpler data structure, namely, a treap
 which has expected logarithmic complexity for search, insertion and deletion
