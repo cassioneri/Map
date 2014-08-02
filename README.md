@@ -3,13 +3,13 @@ Map
 
 The file <tt>map.h</tt> implements a container similar to <tt>std::map</tt>.
 
-The main difference is that <tt>std::map</tt> uses (very likely) a complex data
-structure called red-black tree which guarantees logarithmic complexity for
-insertion and searching.
+The main difference is that <tt>std::map</tt> uses (very likely) called
+red-black tree which guarantees logarithmic complexity for search, insertion and
+deletion.
 
-The one implemented here uses a much simpler data structure, namely, a binary
-search tree which has logarithmic complexity <b>on average</b> for insertion and
-searching but in the worst case the complexity is linear.
+The one implemented here uses a much simpler data structure, namely, a treap
+which has expected logarithmic complexity for search, insertion and deletion
+but in the worst case the complexity is linear.
 
 In addition, this implementation uses operators <tt>&lt;</tt> and <tt>==</tt>
 to compare keys. In contrast, <tt>std::map</tt> allows the usage of other
@@ -20,9 +20,9 @@ correctly, equivalence) of <tt>x</tt> and <tt>y</tt> is expressed by
 <pre>!comp(x, y) && !comp(y, x)</pre>
 
 where <tt>comp</tt> is the comparison object. Notice that this implies two
-calls to <tt>comp::operator()</tt> and this can be wasteful.
+calls to <tt>comp::operator()</tt> which can be wasteful.
 
-The implementation is <b>incomplete</b> (I spent just one day on it) and is not
+The implementation is <b>incomplete</b> (I spent just two days on it) and is not
 meant for production code. This is a simple exercise that I assigned to myself.
 
 The file <tt>map.h</tt> is the implementation.
