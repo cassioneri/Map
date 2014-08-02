@@ -12,6 +12,7 @@
 #define MAP_H_
 
 #include <algorithm>
+#include <cassert>
 #include <initializer_list>
 #include <iterator>
 #include <memory>
@@ -169,7 +170,9 @@ public:
   using difference_type = typename iterator::difference_type;
   using size_type       = typename std::make_unsigned<difference_type>::type;
 
-  map() = default;
+  map() :
+    engine_(std::random_device()()) {
+  }
 
   map(const map& other) {
     copy_(other);
@@ -332,6 +335,10 @@ public:
 
     ++size_;
 
+    #ifndef NDEBUG
+    check_invariants_();
+    #endif
+
     return std::pair<iterator, bool>(position, true);
   }
 
@@ -397,6 +404,11 @@ public:
       get_owner_(node) = nullptr;
 
     --size_;
+
+    #ifndef NDEBUG
+    check_invariants_();
+    #endif
+
     return next;
   }
 
@@ -473,7 +485,7 @@ public:
 private:
 
   owning_ptr_
-  clone_(tnode_ptr_ node, lnode_ptr_& first, lnode_ptr_& last) {
+  clone_(tnode_ptr_ node, lnode_ptr_& first, lnode_ptr_& last) const {
 
     lnode_ptr_ prev = nullptr;
     lnode_ptr_ next = nullptr;
@@ -623,6 +635,48 @@ private:
 
     return pa.get();
   }
+
+  #ifndef NDEBUG
+
+  void
+  check_invariants_() const {
+    check_invariants_(root_.get());
+  }
+
+  void
+  check_invariants_(tnode_ptr_ node) const {
+
+    if (!node)
+      return;
+
+    tnode_ptr_ prev = static_cast<tnode_ptr_>(node->prev);
+    tnode_ptr_ next = static_cast<tnode_ptr_>(node->next);
+
+    assert(!prev || prev->next == node);
+    assert(!next || next->prev == node);
+
+    assert(!prev || prev->value.first < node->value.first);
+
+    assert(!next || next == sentinel_.get() ||
+      node->value.first < next->value.first);
+
+    tnode_ptr_ left  = node->left.get();
+    tnode_ptr_ right = node->right.get();
+
+    assert(!left  || left ->parent == node);
+    assert(!right || right->parent == node);
+
+    assert(!left  || (prev && left->value.first <= prev->value.first));
+    assert(!right || (next && next->value.first <= right->value.first));
+
+    assert(!left  || left ->priority <= node->priority);
+    assert(!right || right->priority <= node->priority);
+
+    check_invariants_(node->left.get());
+    check_invariants_(node->right.get());
+  }
+
+  #endif
 
   std::default_random_engine engine_;
   owning_ptr_                root_;
