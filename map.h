@@ -313,7 +313,7 @@ public:
       node->next->prev = node.get();
 
     else {
-      node->next         = sentinel_.get();
+      node->next      = sentinel_.get();
       sentinel_->prev = node.get();
     }
 
@@ -328,7 +328,7 @@ public:
     else
       parent->right = std::move(node);
 
-    //position = rebalance(position);
+    position = max_heapify_(position);
 
     ++size_;
 
@@ -373,7 +373,7 @@ public:
 
       if (prev->parent != node) { // <=> prev is not node's left child
         if (prev->left) // prev has a left child
-          replace_by_child_(prev, &tnode_::left);
+          replace_by_child_<&tnode_::left>(prev);
         prev->left = std::move(node->left);
         prev->left->parent = prev;
       }
@@ -382,15 +382,16 @@ public:
       if (prev->right)
         prev->right->parent = prev;
 
+      prev->priority   = node->priority;
       prev->parent     = node->parent;
       get_owner_(node) = std::move(prev_owner);
     }
 
     else if (node->left)
-      replace_by_child_(node, &tnode_::left);
+      replace_by_child_<&tnode_::left>(node);
 
     else if (node->right)
-      replace_by_child_(node, &tnode_::right);
+      replace_by_child_<&tnode_::right>(node);
 
     else
       get_owner_(node) = nullptr;
@@ -546,9 +547,11 @@ private:
       return node->parent->right;
   }
 
+  template <owning_ptr_ tnode_::*right>
   void
-  replace_by_child_(tnode_ptr_ node, owning_ptr_ tnode_::*left_right) noexcept {
-    owning_ptr_ child = std::move(node->*left_right);
+  replace_by_child_(tnode_ptr_ node) noexcept {
+    owning_ptr_ child = std::move(node->*right);
+    child->priority   = node->priority;
     child->parent     = node->parent;
     get_owner_(node)  = std::move(child);
   }
@@ -577,9 +580,49 @@ private:
     return find_type == exact_ ? sentinel_.get() : b;
   }
 
-//  lnode_prt_
-//  rebalance(tnode_prt_ node) {
-//  }
+  tnode_ptr_
+  max_heapify_(tnode_ptr_ node) noexcept {
+
+    tnode_ptr_ parent = node->parent;
+
+    if (!parent || node->priority < parent->priority)
+      return node;
+
+    if (parent->left.get() == node)
+      node = rotate_<&tnode_::right, &tnode_::left>(parent);
+
+    else
+      node = rotate_<&tnode_::left, &tnode_::right>(parent);
+
+    return max_heapify_(node);
+  }
+
+  template <owning_ptr_ tnode_::* right, owning_ptr_ tnode_::* left>
+  tnode_ptr_
+  rotate_(tnode_ptr_ a) noexcept {
+    /*
+            a        b
+           / \      / \
+          b   * => *   a
+         / \          / \
+        *   x        x   *
+    */
+
+    owning_ptr_ b        = std::move(a->*left);        // b        = a.left
+
+    a->*left             = std::move(b.get()->*right); // a.left   = x
+    if (a->*left)
+      (a->*left)->parent = a;                          // x.parent = a
+
+    owning_ptr_& pa      = get_owner_(a);
+    b->parent            = a->parent;                  // b.parent = a.parent
+    a->parent            = b.get();                    // a.parent = b
+
+    b.get()->*right      = std::move(pa);              // b.right  = a
+    pa                   = std::move(b);
+
+    return pa.get();
+  }
 
   std::default_random_engine engine_;
   owning_ptr_                root_;
