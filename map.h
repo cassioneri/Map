@@ -83,7 +83,7 @@ private:
 
     // This is the copy constructor of iterator_<false> (a.k.a. iterator) and
     // converting constructor of iterator_<true> (a.k.a. const_iterator) from
-    // iterator_<false>.
+    // iterator_<false> (a.k.a. iterator).
     iterator_(const iterator_<false>& other) noexcept :
       observer_(other.observer_) {
     }
@@ -272,10 +272,10 @@ public:
 
     while (position) {
 
-      parent = position;
-
       if (key == position->value.first)
         return {position, false};
+
+      parent = position;
 
       if (key < position->value.first) {
         next     = position;
@@ -309,7 +309,7 @@ public:
       sentinel_->prev = x.get();
     }
 
-    iterator it = x.get();
+    iterator const it = x.get();
 
     if (empty())
       root_ = std::move(x);
