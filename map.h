@@ -15,6 +15,7 @@
 #include <initializer_list>
 #include <iterator>
 #include <memory>
+#include <random>
 #include <type_traits>
 #include <utility>
 
@@ -35,35 +36,41 @@ private:
 
   enum find_type_ { exact_, lower_bound_, upper_bound_ };
 
-  struct tnode_; // tree node
   struct lnode_; // list node
+  struct tnode_; // tree node
 
   using owning_ptr_   = std::unique_ptr<tnode_>;
   using sentinel_ptr_ = std::unique_ptr<lnode_>;
   using tnode_ptr_    = tnode_*;
   using lnode_ptr_    = lnode_*;
+  using priority_t    = std::default_random_engine::result_type;
 
+  // list node
   struct lnode_ {
     lnode_ptr_ prev;
     lnode_ptr_ next;
   };
 
+  // tree node
   struct tnode_ : lnode_ {
 
-    tnode_(lnode_ lnode, const value_type& value, tnode_ptr_ parent) :
+    tnode_(lnode_ lnode, const value_type& value, tnode_ptr_ parent,
+      priority_t priority) :
       lnode_(lnode),
       value(value),
+      priority(priority),
       parent(parent) {
     }
 
     tnode_(lnode_ lnode, const value_type& value, tnode_ptr_ parent,
-      owning_ptr_&& left, owning_ptr_&& right) :
-      tnode_(lnode, value, parent) {
+      priority_t priority, owning_ptr_&& left, owning_ptr_&& right) :
+      tnode_(lnode, value, parent, priority) {
       this->left  = std::move(left);
       this->right = std::move(right);
     }
 
     value_type  value;
+    priority_t  priority;
     tnode_ptr_  parent;
     owning_ptr_ left  = nullptr;
     owning_ptr_ right = nullptr;
@@ -288,41 +295,44 @@ public:
       }
     }
 
-    owning_ptr_ x(new tnode_{{previous, next}, {key, value}, parent});
+    owning_ptr_ node(new tnode_{{previous, next}, {key, value}, parent,
+      engine_()});
 
     if (!sentinel_)
       sentinel_.reset(new lnode_);
 
     // No throwing code.
 
-    if (x->prev)
-      x->prev->next = x.get();
+    if (node->prev)
+      node->prev->next = node.get();
 
     else
-      first_ = x.get();
+      first_ = node.get();
 
-    if (x->next)
-      x->next->prev = x.get();
+    if (node->next)
+      node->next->prev = node.get();
 
     else {
-      x->next         = sentinel_.get();
-      sentinel_->prev = x.get();
+      node->next         = sentinel_.get();
+      sentinel_->prev = node.get();
     }
 
-    iterator const it = x.get();
+    position = node.get();
 
     if (empty())
-      root_ = std::move(x);
+      root_ = std::move(node);
 
     else if (next == parent)
-      parent->left = std::move(x);
+      parent->left = std::move(node);
 
     else
-      parent->right = std::move(x);
+      parent->right = std::move(node);
+
+    //position = rebalance(position);
 
     ++size_;
 
-    return std::pair<iterator, bool>(it, true);
+    return std::pair<iterator, bool>(position, true);
   }
 
   std::pair<iterator, bool>
@@ -474,7 +484,7 @@ private:
       nullptr;
 
     owning_ptr_ root(new tnode_{{prev, next}, node->value, nullptr,
-      std::move(left), std::move(right)});
+      node->priority, std::move(left), std::move(right)});
 
     if (root->left)
       root->left->parent = root.get();
@@ -567,10 +577,15 @@ private:
     return find_type == exact_ ? sentinel_.get() : b;
   }
 
-  owning_ptr_   root_;
-  sentinel_ptr_ sentinel_;
-  lnode_ptr_    first_ = nullptr;
-  size_type     size_  = 0;
+//  lnode_prt_
+//  rebalance(tnode_prt_ node) {
+//  }
+
+  std::default_random_engine engine_;
+  owning_ptr_                root_;
+  sentinel_ptr_              sentinel_;
+  lnode_ptr_                 first_ = nullptr;
+  size_type                  size_  = 0;
 
 }; // class map
 
